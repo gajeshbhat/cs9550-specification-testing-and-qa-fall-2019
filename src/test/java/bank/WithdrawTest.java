@@ -7,18 +7,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WithdrawTest {
+	
+	public int dollarsToCents(int x) {
+		return (x*100);
+	}
 
 	public static int accountBalance;
 	public static FeesCalculator WithdrawTestObj;
-	public static int drawAmount,drawFee,expctedFee;
+	public static int drawAmount,drawFee,expctedFee,dayOfWeek;
+	public static boolean student;
 	
 	@BeforeClass
 	public static void initAccountDetails() {
 		WithdrawTestObj = new FeesCalculator();
-	}
-	
-	public static int getCentsFromDollars(int dollarAmount) {
-		return dollarAmount*100;
 	}
 	
 	
@@ -26,101 +27,74 @@ public class WithdrawTest {
 	
 	@Before
 	public void initAccountBalanceStudent(){
-		accountBalance = getCentsFromDollars(10000);
+		accountBalance = dollarsToCents(10000);
 	}
 	
-	// A transaction performed on the weekend by a student
+	// Day of the week covers the entire range of values for the days
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalStudentRWC1() {
+		student = true;
+		dayOfWeek = -1;
+		drawAmount = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalStudentRWC2() {
+		student = true;
+		dayOfWeek = 0;
+		drawAmount = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
 	
 	@Test
-	public void testWithdrawalStudentWeekendSub0() {
-		
-		drawAmount = getCentsFromDollars(100);
+	public void testWithdrawalStudentRWC3() {
+		student = true;
+		dayOfWeek = 1;
+		drawAmount = dollarsToCents(100);
 		expctedFee = 0;
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, -1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalStudentWeekendSub1() {
-		
-		drawAmount = getCentsFromDollars(100);
+	public void testWithdrawalStudentRWC4() {
+		student = true;
+		dayOfWeek = 2;
+		drawAmount = dollarsToCents(100);
+		expctedFee = Math.round(drawAmount*0.001f);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+		assertEquals(expctedFee,drawFee);
+	}
+	
+	
+	@Test
+	public void testWithdrawalStudentRWC5() {
+		student = true;
+		dayOfWeek = 6;
+		drawAmount = dollarsToCents(100);
+		expctedFee = Math.round(drawAmount*0.001f);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student,dayOfWeek);
+		assertEquals(expctedFee,drawFee);
+	}
+	
+	@Test
+	public void testWithdrawalStudentRWC6() {
+		student = true;
+		dayOfWeek = 7;
+		drawAmount = dollarsToCents(100);
 		expctedFee = 0;
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 0);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
-	@Test
-	public void testWithdrawalStudentWeekendSub2() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = 0;
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekendSub3() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = 0;
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 2);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekendSub4() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = 0;
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 7);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	// A transaction performed on the weekday by the student costing 0.1% of the withdraw amount
-	
-	@Test
-	public void testWithdrawalStudentWeekdaySub0() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, -1);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekdaySub1() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 0);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekdaySub2() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekdaySub3() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 2);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalStudentWeekdaySub4() {
-		
-		drawAmount = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, true, 7);
-		assertEquals(expctedFee,drawFee);
+	@Test (expected = Exception.class)
+	public void testWithdrawalStudentRWC7() {
+		student = true;
+		dayOfWeek = 8;
+		drawAmount = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 	}
 	
 	
@@ -128,222 +102,248 @@ public class WithdrawTest {
 	
 	// A transaction performed by a non student on account with balance less than 1000
 	
+	@Test (expected = Exception.class)
+	public void testWithdrawalNonStudentRWC8() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(-1);
+		drawAmount  = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalNonStudentRWC9() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(0);
+		drawAmount  = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalNonStudentRWC10() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1);
+		drawAmount  = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
+	
 	@Test
-	public void testWithdrawalLessSub0() {
-		
-		accountBalance = getCentsFromDollars(-1);
-		drawAmount  = getCentsFromDollars(100);
+	public void testWithdrawalNonStudentRWC11() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(500);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalLessSub1() {
-		
-		accountBalance = getCentsFromDollars(0);
-		drawAmount  = getCentsFromDollars(100);
+	public void testWithdrawalNonStudentRWC12() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(999);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+		assertEquals(expctedFee,drawFee);
+	}
+	
+	
+	@Test
+	public void testWithdrawalNonStudentRWC13() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1000);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalLessSub2() {
-		
-		accountBalance = getCentsFromDollars(999);
-		drawAmount  = getCentsFromDollars(100);
+	public void testWithdrawalNonStudentRWC14() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1001);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+		assertEquals(expctedFee,drawFee);
+	}
+	
+	// A transaction performed by a non student on account with balance between 1000 and 10000	
+	
+	@Test
+	public void testWithdrawalNonStudentRWC15() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(999);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalLessSub3() {
-		
-		accountBalance = getCentsFromDollars(200);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC16() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1000);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	@Test
-	public void testWithdrawalLessSub4() {
-
-		accountBalance = getCentsFromDollars(500);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	@Test
-	public void testWithdrawalLessSub5() {
-		
-		accountBalance = getCentsFromDollars(1000);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC17() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1001);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalLessSub6() {
-		
-		accountBalance = getCentsFromDollars(1001);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.002 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC18() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(1500);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
-	
-	// A transaction performed by a non student on account with balance between 1000 and 10K	
-	
 	@Test
-	public void testWithdrawalBetweenSub0() {
-		
-		accountBalance = getCentsFromDollars(999);
-		drawAmount  = getCentsFromDollars(100);
+	public void testWithdrawalNonStudentRWC19() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(5000);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
-	
-	public void testWithdrawalBetweenSub1() {
-		
-		accountBalance = getCentsFromDollars(1000);
-		drawAmount  = getCentsFromDollars(100);
+	@Test
+	public void testWithdrawalNonStudentRWC20() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(9999);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
-	public void testWithdrawalBetweenSub2() {
-		
-		accountBalance = getCentsFromDollars(1001);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	@Test
+	public void testWithdrawalNonStudentRWC21() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(10000);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
-	
-	public void testWithdrawalBetweenSub3() {
-		
-		accountBalance = getCentsFromDollars(1200);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	public void testWithdrawalBetweenSub4() {
-		
-		accountBalance = getCentsFromDollars(5000);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	public void testWithdrawalBetweenSub5() {
-		
-		accountBalance = getCentsFromDollars(9999);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	public void testWithdrawalBetweenSub6() {
-		
-		accountBalance = getCentsFromDollars(10000);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		assertEquals(expctedFee,drawFee);
-	}
-	public void testWithdrawalBetweenSub7() {
-		
-		accountBalance = getCentsFromDollars(10001);
-		drawAmount  = getCentsFromDollars(100);
-		expctedFee = (int)(0.001 * drawAmount);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	@Test
+	public void testWithdrawalNonStudentRWC22() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(10001);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	// A transaction performed by a non student on account with balance is more than 10K
 	
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalNonStudentRWC23() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(-1);
+		drawAmount  = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
+	@Test (expected = Exception.class)
+	public void testWithdrawalNonStudentRWC24() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(0);
+		drawAmount  = dollarsToCents(100);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+	}
+	
 	@Test
-	
-	public void testWithdrawalMoreSub0() {
-		
-		accountBalance = getCentsFromDollars(0);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		expctedFee = 0;
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	public void testWithdrawalMoreSub1() {
-		
-		accountBalance = getCentsFromDollars(200);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		expctedFee = 0;
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	public void testWithdrawalMoreSub2() {
-		
-		accountBalance = getCentsFromDollars(500);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		expctedFee = 0;
-		assertEquals(expctedFee,drawFee);
-	}
-	
-	public void testWithdrawalMoreSub3() {
-		
-		accountBalance = getCentsFromDollars(9999);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		expctedFee = 0;
+	public void testWithdrawalNonStudentRWC25() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(200);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.002 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalMoreSub4() {
-		
-		accountBalance = getCentsFromDollars(10000);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
-		expctedFee = 0;
+	public void testWithdrawalNonStudentRWC26() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(9999);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = (int)(0.001 * drawAmount);
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalMoreSub5() {
-		
-		accountBalance = getCentsFromDollars(10001);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC27() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(10000);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalMoreSub6() {
-		
-		accountBalance = getCentsFromDollars(20000);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC28() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(10001);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 	
 	@Test
-	public void testWithdrawalMoreSub7() {
-		
-		accountBalance = getCentsFromDollars(50000);
-		drawAmount  = getCentsFromDollars(100);
-		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, false, 1);
+	public void testWithdrawalNonStudentRWC29() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(20000);
+		drawAmount  = dollarsToCents(100);
 		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
+		assertEquals(expctedFee,drawFee);
+	}
+	
+	@Test
+	public void testWithdrawalNonStudentRWC30() {
+		student = false;
+		dayOfWeek = 2;
+		accountBalance = dollarsToCents(50000);
+		drawAmount  = dollarsToCents(100);
+		expctedFee = 0;
+		drawFee = WithdrawTestObj.calculateWithdrawalFee(drawAmount, accountBalance, student, dayOfWeek);
 		assertEquals(expctedFee,drawFee);
 	}
 

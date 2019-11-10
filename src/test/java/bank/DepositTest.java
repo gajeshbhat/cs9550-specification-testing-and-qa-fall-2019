@@ -1,210 +1,82 @@
 package bank;
 
 import static org.junit.Assert.*;
-import org.junit.Test;
 
 import org.junit.BeforeClass;
-
-import bank.FeesCalculator;
+import org.junit.Test;
 
 public class DepositTest {
 	
+
 	public static int accountBalance;
-	public static FeesCalculator FeesTestObj;
-	public static int drawAmount,drawFee,expctedFee;
-	public static int amountDeposit,depositInterest,expectedIntrest;
+	public static FeesCalculator depositTestObj;
+	public static int depositAmount;
+	public static double actualFees,expectedFees; 
+
+	public int dollarsToCents(int x) {
+		return (x*100);
+	}
 	
+	public double centsToDollars(double x) {
+		return (x/100);
+	}
 	@BeforeClass
 	public static void initAccountDetails() {
-		FeesTestObj = new FeesCalculator();
+		depositTestObj = new FeesCalculator();
 	}
+
 	
-	public static int getCentsFromDollars(int dollarAmount) {
-		return dollarAmount*100;
-	}
-	
-	// Student Client
-	
-	// A deposit of more than 100$ performed by a student with more than 1000$ Balance 
-	
-	@Test 
-	public void testDepositStudentHighSub0() {
-		
-		accountBalance = getCentsFromDollars(1001);
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = (int)(0.01 * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
+	@Test
+	public void testWR1() {
+		depositAmount = dollarsToCents(50);
+		accountBalance = dollarsToCents(500);
+		boolean student = true;
+		actualFees = depositTestObj.calculateDepositInterest(depositAmount, accountBalance, student);
+		actualFees = centsToDollars(actualFees);
+		expectedFees = centsToDollars((double) (0 * depositAmount));
+		assertEquals(expectedFees,actualFees,0);
 	}
 	
 	@Test
-	public void testDepositStudentHighSub1() {
-		
-		accountBalance = getCentsFromDollars(500);
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = (int)(0.01 * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
+	public void testWR2() {
+		depositAmount = dollarsToCents(250);
+		accountBalance = dollarsToCents(2500);
+		boolean student = false;
+		actualFees = depositTestObj.calculateDepositInterest(depositAmount, accountBalance, student);
+		actualFees = centsToDollars(actualFees);
+		expectedFees = centsToDollars((double) (0 * depositAmount));
+		assertEquals(expectedFees,actualFees,0);
 	}
 	
 	@Test
-	public void testDepositStudentHighSub2() {
-		
-		accountBalance = getCentsFromDollars(-200);
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = (int)(0.01 * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
+	public void testWR3() {
+		depositAmount = dollarsToCents(27500);
+		accountBalance = dollarsToCents(7500);
+		boolean student = true;
+		actualFees = depositTestObj.calculateDepositInterest(depositAmount, accountBalance, student);
+		actualFees = centsToDollars(actualFees);
+		expectedFees = centsToDollars((double) (0.01 * depositAmount));
+		assertEquals(expectedFees,actualFees,0);
 	}
 	
-	// A deposit of more than 100$ performed by a student on account with balance less than 1000$
-	
-	@Test	
-	public void testDepositStudentMediumSub0() {
-		
-		accountBalance = getCentsFromDollars(500);;
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = Math.round(0.005f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
+	@Test (expected = Exception.class)
+	public void testWR4() {
+		depositAmount = dollarsToCents(-50);
+		accountBalance = dollarsToCents(50000);
+		boolean student = false;
+		actualFees = depositTestObj.calculateDepositInterest(depositAmount, accountBalance, student);
+		actualFees = centsToDollars(actualFees);
+		expectedFees = centsToDollars((double) (0.005 * depositAmount));
 	}
 	
-	@Test	
-	public void testDepositStudentMediumSub1() {
-		
-		accountBalance = getCentsFromDollars(1050);;
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = (int)(0.005 * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
+	@Test (expected = Exception.class)
+	public void testWR5() {
+		depositAmount = dollarsToCents(60000);
+		accountBalance = dollarsToCents(3000);
+		boolean student = true;
+		actualFees = depositTestObj.calculateDepositInterest(depositAmount, accountBalance, student);
+		actualFees = centsToDollars(actualFees);
+		expectedFees = centsToDollars((double) (0.01 * depositAmount));
 	}
-	
-	@Test	
-	public void testDepositStudentMediumSub2() {
-		
-		accountBalance = getCentsFromDollars(-200);
-		amountDeposit  = getCentsFromDollars(105);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = (int)(0.005 * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	// A deposit of less than 100$ performed by a student on account with balance more than 5000$
-	@Test	
-	public void testDepositStudentLessInterestSub0() {
-		
-		accountBalance = getCentsFromDollars(5005);
-		amountDeposit  = getCentsFromDollars(50);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = Math.round(0.005f * amountDeposit);;
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	@Test
-	public void testDepositStudentLessInterestSub1() {
-		
-		accountBalance = getCentsFromDollars(4000);
-		amountDeposit  = getCentsFromDollars(50);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = Math.round(0.005f * amountDeposit);;
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	// A deposit of less than 100$ performed by a student on account with balance less than 5000$ - Bug
-		
-		@Test	
-		public void testDepositStudentNoIntSub0() {
-			
-			accountBalance = getCentsFromDollars(4500);
-			amountDeposit  = getCentsFromDollars(50);
-			depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-			expectedIntrest = 0;
-			assertEquals(expectedIntrest,depositInterest);
-		}
-		
-		@Test	
-		public void testDepositStudentNoIntSub1() {
-		
-		accountBalance = getCentsFromDollars(-100);
-		amountDeposit  = getCentsFromDollars(50);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-		expectedIntrest = 0;
-		assertEquals(expectedIntrest,depositInterest);
-		}
-	
-		@Test
-		public void testDepositStudentNoIntSub2() {
-			
-			accountBalance = getCentsFromDollars(5005);
-			amountDeposit  = getCentsFromDollars(50);
-			depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance, true);
-			expectedIntrest = 0;
-			assertEquals(expectedIntrest,depositInterest);
-		}
-	
-	
-	
-	/* Non Student Client */
-		
-	// A deposit of 500+$ performed by a non-student on account with balance more than 5000$ earns 1% interest
-	@Test	
-	public void testDepositNonStudentInterestSub0() {
-		
-		accountBalance = getCentsFromDollars(5005);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.01f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	@Test	
-	public void testDepositNonStudentInterestSub1() {
-		
-		accountBalance = getCentsFromDollars(4500);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.01f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	@Test	
-	public void testDepositNonStudentInterestSub2() {
-		
-		accountBalance = getCentsFromDollars(-100);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.01f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	// A deposit of 500+$ performed by a non-student on account with balance less than 5000$ earns 1% interest
-	@Test	
-	public void testDepositNonStudenLesstInterestSub0() {
-		
-		accountBalance = getCentsFromDollars(4500);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.005f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	@Test	
-	public void testDepositNonStudenLesstInterestSub1() {
-		
-		accountBalance = getCentsFromDollars(-100);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.005f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
-	
-	@Test	
-	public void testDepositNonStudenLesstInterestSub2() {
-		
-		accountBalance = getCentsFromDollars(5500);
-		amountDeposit  = getCentsFromDollars(505);
-		depositInterest = FeesTestObj.calculateDepositInterest(amountDeposit,accountBalance,false);
-		expectedIntrest = Math.round(0.005f * amountDeposit);
-		assertEquals(expectedIntrest,depositInterest);
-	}
+
 }
